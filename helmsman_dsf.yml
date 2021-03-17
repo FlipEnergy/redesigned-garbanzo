@@ -44,4 +44,14 @@ apps:
     secretsFile: helm_charts/postgresql/secrets.postgres-creds.yaml
     priority: -100
 
+  # CI Systems
+  concourse:
+    <<: *default
+    namespace: concourse
+    enabled: true
+    chart: concourse/concourse
+    version: 14.6.2
+    valuesFile: helm_charts/concourse/concourse-values.yaml
+    secretsFile: helm_charts/concourse/secrets.concourse-creds.yaml
+
   # Applications
