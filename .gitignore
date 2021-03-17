@@ -1,0 +1,6 @@
+*.yaml.dec
+*.key
+*.crt
+*.pem
+*.pyc
+.helmsman-tmp/

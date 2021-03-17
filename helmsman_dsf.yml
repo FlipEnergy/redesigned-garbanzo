@@ -1,0 +1,35 @@
+context: todo
+
+metadata:
+  maintainer: Dennis Zhang (dennis.zhang.nrg@gmail.com)
+  description: DSF for a flask to do list app
+
+settings:
+  kubeContext: gke_gorgias-callenge_us-central1-c_cluster-1
+  globalMaxHistory: 5
+
+namespaces:
+  concourse:
+  postgresql:
+
+helmRepos:
+  bitnami: https://charts.bitnami.com/bitnami
+  concourse: https://concourse-charts.storage.googleapis.com/
+
+appsTemplates:
+  default: &default
+    wait: true
+
+apps:
+  # Databases
+  postgresql:
+    <<: *default
+    namespace: postgresql
+    enabled: true
+    chart: bitnami/postgresql
+    version: 10.3.7
+    valuesFile: helm_charts/postgresql/postgres-values.yaml
+    secretsFile: helm_charts/postgresql/secrets.postgres-creds.yaml
+    priority: -100
+
+  # Applications
