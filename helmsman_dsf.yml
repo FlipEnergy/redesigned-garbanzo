@@ -5,22 +5,34 @@ metadata:
   description: DSF for a flask to do list app
 
 settings:
-  kubeContext: gke_gorgias-callenge_us-central1-c_cluster-1
+  # kubeContext: gke_gorgias-callenge_us-central1-c_cluster-1
   globalMaxHistory: 5
 
 namespaces:
   concourse:
+  kube-ops-view:
   postgresql:
 
 helmRepos:
   bitnami: https://charts.bitnami.com/bitnami
   concourse: https://concourse-charts.storage.googleapis.com/
+  stable: https://charts.helm.sh/stable
 
 appsTemplates:
   default: &default
     wait: true
 
 apps:
+  # Monitoring
+  kube-ops-view:
+    <<: *default
+    namespace: kube-ops-view
+    enabled: true
+    chart: stable/kube-ops-view
+    version: 1.2.1
+    valuesFile: helm_charts/kube-ops-view/kube-ops-view-values.yaml
+    priority : -100
+
   # Databases
   postgresql:
     <<: *default

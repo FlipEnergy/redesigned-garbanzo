@@ -1,0 +1,47 @@
+replicaCount: 1
+image:
+  repository: hjacobs/kube-ops-view
+  tag: 20.4.0
+  pullPolicy: IfNotPresent
+
+service:
+  # annotations:
+  #   service.beta.kubernetes.io/aws-load-balancer-internal: "0.0.0.0/0"
+  # labels:
+  #   key: value
+  type: ClusterIP
+  externalPort: 80
+  internalPort: 8080
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+ingress:
+  enabled: false
+
+rbac:
+  # If true, create & use RBAC resources
+  create: true
+  # Ignored if rbac.create is true
+  serviceAccountName: default
+
+## Additional pod labels
+## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+podLabels: {}
+affinity: {}
+nodeSelector: {}
+tolerations: []
+
+# pass env vars like this: helm [...] --set env.ENV_NAME=env_value,env.ENV_NAME2=env_value2
+env: {}
+
+# Add securityContext
+securityContext: {}
+
+# Add securityContext at pod level:
+podSecurityContext: {}
