@@ -20,7 +20,7 @@ concourse:
   web:
     ## A name for this Concourse cluster, to be displayed on the dashboard page.
     ##
-    clusterName: Homelab
+    clusterName: garbonzo
 
     ## Enable this flag in order to customize the `client_id` and
     ## `client_secret` used when logging into the Concourse UI.
@@ -161,7 +161,7 @@ concourse:
 
     ## Port on which to listen for HTTP traffic (web UI and API).
     ##
-    bindPort: 8080
+    bindPort: 80
 
     ## TLS configuration for the web component to be able to serve HTTPS traffic.
     ## Once enabled, consumes the certificates set via secrets (`web-tls-cert` and
@@ -183,7 +183,7 @@ concourse:
     ##
     ## Example: http://ci.concourse-ci.org
     ##
-    externalUrl: http://concourse.tgp
+    externalUrl: http://garbonzo-concourse.duckdns.org
 
     encryption:
       ## Enable encryption of pipeline configuration. Encryption keys can be set via secrets
@@ -909,7 +909,7 @@ web:
       ## For minikube, set this to ClusterIP, elsewhere use LoadBalancer or NodePort
       ## Ref: https://kubernetes.io/docs/user-guide/services/#publishing-services---service-types
       ##
-      type: ClusterIP
+      type: LoadBalancer
 
       ## When using `web.service.api.type: ClusterIP`, sets the user-specified cluster IP.
       ## Example: 172.217.1.174
@@ -1015,27 +1015,21 @@ web:
   ingress:
     ## Enable Ingress.
     ##
-    enabled: true
+    enabled: false
 
     ## Annotations to be added to the web ingress.
     ## Example:
     ##   kubernetes.io/ingress.class: nginx
     ##   kubernetes.io/tls-acme: 'true'
     ##
-    annotations:
-      nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
-      nginx.ingress.kubernetes.io/proxy-read-timeout: "90"
-      nginx.ingress.kubernetes.io/configuration-snippet: |
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
+    annotations: {}
 
     ## Hostnames.
     ## Must be provided if Ingress is enabled.
     ## Example:
     ##   - concourse.domain.com
     ##
-    hosts:
-      - garbonzo-concourse.duckdns.org
+    hosts: {}
 
     ## TLS configuration.
     ## Secrets must be manually created in the namespace.
