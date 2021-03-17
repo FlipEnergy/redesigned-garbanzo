@@ -6,3 +6,15 @@ deploy:
 	-w /garbonzo \
 	praqma/helmsman:v3.6.6 \
 	helmsman $(options) -show-diff --apply -f helmsman_dsf.yml
+
+up:
+	docker-compose up --build -d
+
+stop:
+	docker-compose stop
+
+shell:
+	docker exec -it garbonzo /bin/sh
+
+logs:
+	docker-compose logs -f

@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  garbonzo:
+    build: .
+    container_name: garbonzo
+    command: "flask run -h 0.0.0.0 -p 5000"
+    ports:
+      - 5000:5000
+      - 8000:8000
+    volumes:
+      - ./src:/garbonzo:cached
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=development
+    networks:
+      - app-tier
+
+  postgresql:
+    image: docker.io/bitnami/postgresql:11.11.0-debian-10-r16 
+    container_name: postgresql
+    volumes:
+      - postgresql_data:/bitnami/postgresql:rw # this mounts the docker-managed elasticsearch_data volume into the container and makes it writable
+    environment:
+      - POSTGRESQL_USERNAME=garbonzo
+      - POSTGRESQL_PASSWORD=WowSuchSecure123
+      - POSTGRESQL_DATABASE=garbonzo
+      - POSTGRESQL_POSTGRES_PASSWORD=IamTheCaptainNow
+    networks:
+      - app-tier
+
+networks:
+  app-tier:
+    driver: bridge
+
+volumes:
+  postgresql_data:
