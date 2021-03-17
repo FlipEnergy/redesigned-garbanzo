@@ -29,3 +29,11 @@ Make: I like to keep a makefile in a project for easy aliases that are maintaine
 2. Get the GPG key from me.
 3. Import the GPG key to your keychain using `gpg --import <path/to/key>`
 4. Test that you can access the secrets with `helm secrets view helm_charts/postgresql/secrets.postgres-creds.yaml`. You should see yaml printed to stdout.
+
+
+## Info Dump
+
+### postgres
+- deployed via helm using a bitnami chart which already support replication
+- I configured it to use async replication
+- soft antiaffinity between the two postgres pods to try to keep them on separate k8s nodes

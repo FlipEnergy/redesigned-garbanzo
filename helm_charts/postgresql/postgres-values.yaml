@@ -15,9 +15,24 @@ containerSecurityContext:
   enabled: true
   runAsUser: 1000
 
+replication:
+  enabled: true
+  user: repl_user
+  # password: secret
+  readReplicas: 1
+  ## Set synchronous commit mode: on, off, remote_apply, remote_write and local
+  ## ref: https://www.postgresql.org/docs/9.6/runtime-config-wal.html#GUC-WAL-LEVEL
+  synchronousCommit: 'off'
+  ## From the number of `readReplicas` defined above, set the number of those that will have synchronous replication
+  ## NOTE: It cannot be > readReplicas
+  numSynchronousReplicas: 0
+  ## Replication Cluster application name. Useful for defining multiple replication policies
+  ##
+  applicationName: my_application
+
 ## PostgreSQL admin password (used when `postgresqlUsername` is not `postgres`)
 ## ref: https://github.com/bitnami/bitnami-docker-postgresql/blob/master/README.md#creating-a-database-user-on-first-run (see note!)
-# postgresqlPostgresPassword:
+# postgresqlPostgresPassword: unused
 
 ## PostgreSQL user (has superuser privileges if username is `postgres`)
 ## ref: https://github.com/bitnami/bitnami-docker-postgresql/blob/master/README.md#setting-the-root-password-on-first-run
@@ -27,7 +42,7 @@ postgresqlUsername: postgres
 ## PostgreSQL password
 ## ref: https://github.com/bitnami/bitnami-docker-postgresql/blob/master/README.md#setting-the-root-password-on-first-run
 ##
-# postgresqlPassword:
+# postgresqlPassword: secret
 
 ## PostgreSQL password using existing secret
 ## existingSecret: secret
@@ -150,7 +165,7 @@ persistence:
   storageClass: standard
   accessModes:
     - ReadWriteOnce
-  size: 10Gi
+  size: 1Gi
   annotations: {}
   ## selector can be used to match an existing PersistentVolume
   ## selector:
@@ -266,6 +281,113 @@ primary:
   # type:
   # nodePort:
   # clusterIP:
+
+##
+## PostgreSQL read only replica parameters
+##
+readReplicas:
+  ## PostgreSQL read only pod affinity preset
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
+  ## Allowed values: soft, hard
+  ##
+  podAffinityPreset: ""
+
+  ## PostgreSQL read only pod anti-affinity preset
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
+  ## Allowed values: soft, hard
+  ##
+  podAntiAffinityPreset: soft
+
+  ## PostgreSQL read only node affinity preset
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity
+  ## Allowed values: soft, hard
+  ##
+  nodeAffinityPreset:
+    ## Node affinity type
+    ## Allowed values: soft, hard
+    type: ""
+    ## Node label key to match
+    ## E.g.
+    ## key: "kubernetes.io/e2e-az-name"
+    ##
+    key: ""
+    ## Node label values to match
+    ## E.g.
+    ## values:
+    ##   - e2e-az1
+    ##   - e2e-az2
+    ##
+    values: []
+
+  ## Affinity for PostgreSQL read only pods assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  ## Note: readReplicas.podAffinityPreset, readReplicas.podAntiAffinityPreset, and readReplicas.nodeAffinityPreset will be ignored when it's set
+  ##
+  affinity: {}
+
+  ## Node labels for PostgreSQL read only  pods assignment
+  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ##
+  nodeSelector: {}
+
+  ## Tolerations for PostgreSQL read only  pods assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
+  labels: {}
+  annotations: {}
+  podLabels: {}
+  podAnnotations: {}
+  priorityClassName: ''
+
+  ## Extra init containers
+  ## Example
+  ##
+  ## extraInitContainers:
+  ##   - name: do-something
+  ##     image: busybox
+  ##     command: ['do', 'something']
+  ##
+  extraInitContainers: []
+
+  ## Additional PostgreSQL read replicas Volume mounts
+  ##
+  extraVolumeMounts: []
+
+  ## Additional PostgreSQL read replicas Volumes
+  ##
+  extraVolumes: []
+
+  ## Add sidecars to the pod
+  ##
+  ## For example:
+  ## sidecars:
+  ##   - name: your-image-name
+  ##     image: your-image
+  ##     imagePullPolicy: Always
+  ##     ports:
+  ##       - name: portname
+  ##         containerPort: 1234
+  ##
+  sidecars: []
+
+  ## Override the service configuration for read
+  ##
+  service: {}
+  # type:
+  # nodePort:
+  # clusterIP:
+
+  ## Whether to enable PostgreSQL read replicas data Persistent
+  ##
+  persistence:
+    enabled: true
+
+  # Override the resource configuration for read replicas
+  resources: 
+    requests:
+      memory: 256Mi
+      cpu: 250m
 
 
 ## Configure extra options for startup, liveness and readiness probes
