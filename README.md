@@ -124,6 +124,7 @@ If you wish to deploy the latest version of the app + helm chart, simply go to t
 ### concourse
 - pipeline to build image on new commits to repo then deploys if image builds successfully
 - uses a Google service account to authenticate, but account has editor permissions. In a real scenario, I'd lock it down to just the necessary permissions
+- I had to make a new image that included both helmsman and google SDK for the service account to be able to deploy
 
 ### Kube-ops-view
 - nice visualization of pods on the nodes that I like to use
