@@ -13,4 +13,4 @@ RUN mkdir -p /usr/local/gcloud \
   && /usr/local/gcloud/google-cloud-sdk/bin/gcloud components install kubectl --quiet
 
 # Adding the package path to local
-ENV PATH $PATH:/usr/local/gcloud/google-cloud-sdk/bin
+ENV PATH="${PATH}:/usr/local/gcloud/google-cloud-sdk/bin"

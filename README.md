@@ -139,5 +139,5 @@ If you wish to deploy the latest version of the app + helm chart, simply go to t
 ### There's a typo in the project ID
 - yeah... typed too fast and missed the h. Since I can't change it and this is temporary, I'll just keep it like that.
 
-### Why redesigned-garbanzo?
+### Why is the repo named redesigned-garbanzo?
 - because that's the auto generated repo name github suggested

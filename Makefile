@@ -20,8 +20,9 @@ shell:
 logs:
 	docker-compose logs -f
 
+# a utility image that runs in concourse for deployments to GKE
 gcloud_helmsman:
-	docker build -t gcr.io/gorgias-callenge/gcloud_helmsman .
+	docker build -t gcr.io/gorgias-callenge/gcloud_helmsman -f concourse_pipelines/gcloud_helmsman_Dockerfile .
 	docker push gcr.io/gorgias-callenge/gcloud_helmsman
 
 pipeline:
