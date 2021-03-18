@@ -15,7 +15,7 @@ A flask to do list app backed by PostgreSQL
 To avoid downloading tools, I just use docker images of them. Easier to upgrade and maintain. Local dev will also be using docker and docker-compose. We'll be runninng [Helmsman](https://github.com/Praqma/helmsman) thru docker for deployments.
 
 ### Helm3
-Even though Helm is used directly, it's necessary to use the Helm secrets plugin.
+Even though Helm is not used directly, it's necessary to use the Helm secrets plugin.
 How to install helm3: https://helm.sh/docs/intro/install/
 
 ### [Helm secrets plugin](https://github.com/jkroepke/helm-secrets)
@@ -53,7 +53,7 @@ kubectl -n concourse create secret generic gpg-key --from-file=secretKey=<path t
 
 The pipeline consists of 2 jobs. The first one is triggered automatically on any repo commit to the main branch. It will build the docker image then push it to google image repository. The second job then takes that image and deploys it to k8s.
 
-Some optimizations here would be to only build image on src code change and only deploy on either helm chart update or new image.
+Some optimizations here would be to only build image on src code change and only deploy on either helm chart update or new image. Another option is rather than treating images as the artifact, a helm package could be produced which would incorporate the correct image tag. That would require the automation to edit yaml so it's a little more work so I didn't do it for this project.
 
 ### [Gunicorn](https://docs.gunicorn.org/en/stable/index.html)
 When running Flask apps in production, one would want to it as a WSGI process in production. In k8s, I opted to run gunicorn will run 2 instances Flask workers because 1) the nodes appear to have 2 cores/CPUs, and 2) we want to run at least 2 since one Flask worker/instance will be occupied with health check calls part of the time. I did not opt to run it as a gevent because while gevent is good for asynchronous work that block often, serving synchronous requests, even if it does get blocked by a database query for example, we would want that request to return ASAP with minimal latency. Gevent is a co-operative threading (coroutine) module, and unless threads, co-routines are pseudo-threads that will only give CPU time to other threads upon yielding, meaning a request in thread A could still be waiting for it's turn to run because thread B hasn't yielded, resulting in a delayed response.
@@ -61,7 +61,7 @@ When running Flask apps in production, one would want to it as a WSGI process in
 ## Directories in this Repo
 
 ### concourse_pipelines
-Concourse Pipeline Yaml definition for CICD pipeline as well as scripts the jobs run
+Concourse Pipeline Yaml definition for CICD pipeline as well as scripts the jobs run. It also has a Dockerfile for the image that the deploy-to-k8s job runs which has the gcloud and helmsman tools.
 
 ### helm_charts
 Helm chart for deploying this flask app as well as override files for the other charts used
@@ -107,7 +107,6 @@ GARBANZO_TAG=latest docker run --rm -it \
 	-e GARBANZO_TAG=$GARBANZO_TAG \
 	praqma/helmsman:v3.6.6 \
 	helmsman -show-diff --apply -f helmsman_dsf.yml
-
 ```
 
 It spins up a docker container running Helmsman which will take the [helmsman_dsf.yml](helmsman_dsf.yml) as the desired state and update the k8s cluster to match the state. In this case, it'll spin up postgres (and kube-ops-view) first since it's a dependency, wait until it's ready then it will deploy the app.
@@ -115,7 +114,7 @@ It spins up a docker container running Helmsman which will take the [helmsman_ds
 ### Deploy using concourse
 If you wish to deploy the latest version of the app + helm chart, simply go to this [link](http://garbanzo-concourse.duckdns.org/teams/main/pipelines/build-and-deploy/jobs/deploy-to-k8s), login with creds found on line `localUsers: <username>:<password>` in the output of `helm secrets view helm_charts/concourse/secrets.concourse-creds.yaml | grep localUsers` and hit the `+` button on the top right to trigger another run (which would likely be a no-op since it's already the latest deployed).
 
-## Info Dump
+## Misc Info Dump
 
 ### postgres
 - deployed via helm using a bitnami chart which already support replication
@@ -135,7 +134,7 @@ If you wish to deploy the latest version of the app + helm chart, simply go to t
 - If you're unfamiliar with this tool, I recommend you watch it when deploying pods. The animations are cool
 
 ### Duck DNS
-- a free and super quick setup DNS service that allows me to use a sub domain of duckdns.org
+- a free and super quick setup DNS service that allows me to use a sub domain of www.duckdns.org
 
 ### HTTPS
 - Yes, I would've setup Let's Encrypt for HTTPS in a real project
