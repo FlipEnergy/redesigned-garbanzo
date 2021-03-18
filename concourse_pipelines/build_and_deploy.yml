@@ -70,6 +70,8 @@ jobs:
             type: registry-image
             source:
               repository: gcr.io/gorgias-callenge/gcloud_helmsman
+              username: ((gcs_registry_username))
+              password: ((gcs_registry_password))
 
           inputs:
             - name: redesigned-garbanzo
