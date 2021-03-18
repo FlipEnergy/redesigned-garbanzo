@@ -56,7 +56,7 @@ The pipeline consists of 2 jobs. The first one is triggered automatically on any
 ### [Gunicorn](https://docs.gunicorn.org/en/stable/index.html)
 When running Flask apps in production, one would want to it as a WSGI process in production. In k8s, I opted to run gunicorn will run 2 instances Flask workers because 1) the nodes appear to have 2 cores/CPUs, and 2) we want to run at least 2 since one Flask worker/instance will be occupied with health check calls part of the time. I did not opt to run it as a gevent because while gevent is good for asynchronous work that block often, serving synchronous requests, even if it does get blocked by a database query for example, we would want that request to return ASAP with minimal latency. Gevent is a co-operative threading (coroutine) module, and unless threads, co-routines are pseudo-threads that will only give CPU time to other threads upon yielding, meaning a request in thread A could still be waiting for it's turn to run because thread B hasn't yielded, resulting in a delayed response.
 
-## Directories
+## Directories in this Repo
 
 ### concourse_pipelines
 Concourse Pipeline Yaml definition for CICD pipeline as well as scripts the jobs run
@@ -138,3 +138,6 @@ If you wish to deploy the latest version of the app + helm chart, simply go to t
 
 ### There's a typo in the project ID
 - yeah... typed too fast and missed the h. Since I can't change it and this is temporary, I'll just keep it like that.
+
+### Why redesigned-garbanzo?
+- because that's the auto generated repo name github suggested
