@@ -53,6 +53,8 @@ kubectl -n concourse create secret generic gpg-key --from-file=secretKey=<path t
 
 The pipeline consists of 2 jobs. The first one is triggered automatically on any repo commit to the main branch. It will build the docker image then push it to google image repository. The second job then takes that image and deploys it to k8s.
 
+Some optimizations here would be to only build image on src code change and only deploy on either helm chart update or new image.
+
 ### [Gunicorn](https://docs.gunicorn.org/en/stable/index.html)
 When running Flask apps in production, one would want to it as a WSGI process in production. In k8s, I opted to run gunicorn will run 2 instances Flask workers because 1) the nodes appear to have 2 cores/CPUs, and 2) we want to run at least 2 since one Flask worker/instance will be occupied with health check calls part of the time. I did not opt to run it as a gevent because while gevent is good for asynchronous work that block often, serving synchronous requests, even if it does get blocked by a database query for example, we would want that request to return ASAP with minimal latency. Gevent is a co-operative threading (coroutine) module, and unless threads, co-routines are pseudo-threads that will only give CPU time to other threads upon yielding, meaning a request in thread A could still be waiting for it's turn to run because thread B hasn't yielded, resulting in a delayed response.
 
@@ -123,8 +125,9 @@ If you wish to deploy the latest version of the app + helm chart, simply go to t
 
 ### concourse
 - pipeline to build image on new commits to repo then deploys if image builds successfully
-- uses a Google service account to authenticate, but account has editor permissions. In a real scenario, I'd lock it down to just the necessary permissions
+- uses a Google service account to push/pull images and deploy to k8s. Has limited permissions
 - I had to make a new image that included both helmsman and google SDK for the service account to be able to deploy
+- it also uses postgres as a database so it has it's own database and creds
 
 ### Kube-ops-view
 - nice visualization of pods on the nodes that I like to use
