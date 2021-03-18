@@ -5,7 +5,7 @@ A flask to do list app backed by PostgreSQL
 
 [kube-ops-view](http://garbanzo-kube.duckdns.org/#reload=600;scale=3)
 
-[concourse](http://garbanzo-concourse.duckdns.org)
+[concourse CICD pipeline](http://garbanzo-concourse.duckdns.org/teams/main/pipelines/build-and-deploy)
 
 [To Do List Flask App](http://garbanzo-app.duckdns.org)
 
@@ -51,13 +51,15 @@ So a manual step of adding a kubernetes secret is necessary and I have done this
 kubectl -n concourse create secret generic gpg-key --from-file=secretKey=<path to secret key>
 ```
 
+The pipeline consists of 2 jobs. The first one is triggered automatically on any repo commit to the main branch. It will build the docker image then push it to google image repository. The second job then takes that image and deploys it to k8s.
+
 ### [Gunicorn](https://docs.gunicorn.org/en/stable/index.html)
 When running Flask apps in production, one would want to it as a WSGI process in production. In k8s, I opted to run gunicorn will run 2 instances Flask workers because 1) the nodes appear to have 2 cores/CPUs, and 2) we want to run at least 2 since one Flask worker/instance will be occupied with health check calls part of the time. I did not opt to run it as a gevent because while gevent is good for asynchronous work that block often, serving synchronous requests, even if it does get blocked by a database query for example, we would want that request to return ASAP with minimal latency. Gevent is a co-operative threading (coroutine) module, and unless threads, co-routines are pseudo-threads that will only give CPU time to other threads upon yielding, meaning a request in thread A could still be waiting for it's turn to run because thread B hasn't yielded, resulting in a delayed response.
 
 ## Directories
 
 ### concourse_pipelines
-Concourse Pipeline Yaml definition for CICD pipeline
+Concourse Pipeline Yaml definition for CICD pipeline as well as scripts the jobs run
 
 ### helm_charts
 Helm chart for deploying this flask app as well as override files for the other charts used

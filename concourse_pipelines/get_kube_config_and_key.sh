@@ -14,4 +14,4 @@ cp -v /root/.kube/config redesigned-garbanzo/kube_config
 # install kubectl
 gcloud components install kubectl --quiet
 
-kubectl -n concourse get secret gpg-key -o jsonpath='{.data.secretKey}' | base64 --decode > redesigned-garbanzo/secretKey.asc
+kubectl -n concourse get secret gpg-key -o jsonpath='{.data.secretKey}' | base64 -d > redesigned-garbanzo/secretKey.asc
