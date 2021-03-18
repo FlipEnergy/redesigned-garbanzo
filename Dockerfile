@@ -1,18 +1,18 @@
-# Dockerfile for garbonzo
+# Dockerfile for garbanzo
 
 FROM python:3.9-alpine
 
 ENV PIP_CACHE_DIR=/tmp/.cache PIPENV_CACHE_DIR=/tmp/.cache
 
-RUN addgroup -S -g 1000 garbonzo \
-    && adduser -h /home/garbonzo -g "User account for running garbonzo" \
-    -s /sbin/nologin -S -D -G garbonzo -u 1000 garbonzo
+RUN addgroup -S -g 1000 garbanzo \
+    && adduser -h /home/garbanzo -g "User account for running garbanzo" \
+    -s /sbin/nologin -S -D -G garbanzo -u 1000 garbanzo
 
-USER garbonzo
+USER garbanzo
 
-COPY --chown=garbonzo:garbonzo src /garbonzo
+COPY --chown=garbanzo:garbanzo src /garbanzo
 
-WORKDIR /garbonzo
+WORKDIR /garbanzo
 
 RUN pip install pipenv==2020.11.15 \
     && python -m pipenv install --deploy \

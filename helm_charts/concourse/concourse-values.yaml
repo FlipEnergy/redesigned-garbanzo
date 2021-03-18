@@ -20,7 +20,7 @@ concourse:
   web:
     ## A name for this Concourse cluster, to be displayed on the dashboard page.
     ##
-    clusterName: garbonzo
+    clusterName: garbanzo
 
     ## Enable this flag in order to customize the `client_id` and
     ## `client_secret` used when logging into the Concourse UI.
@@ -183,7 +183,7 @@ concourse:
     ##
     ## Example: http://ci.concourse-ci.org
     ##
-    externalUrl: http://garbonzo-concourse.duckdns.org
+    externalUrl: http://garbanzo-concourse.duckdns.org
 
     encryption:
       ## Enable encryption of pipeline configuration. Encryption keys can be set via secrets
@@ -476,7 +476,7 @@ concourse:
         ## Make sure you have local users support enabled (`concourse.web.localAuth.enabled`) and
         ## that the users were added (`secrets.localUsers`).
         ##
-        localUser: "FlipEnergy"
+        localUser: "garbanzo"
 
     tsa:
       ## Enable this flag in order to customize the `client_id` and

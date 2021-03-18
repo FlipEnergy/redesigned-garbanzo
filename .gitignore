@@ -4,3 +4,4 @@
 *.pem
 *.pyc
 .helmsman-tmp/
+concourse_pipelines/secrets.dec.yml

@@ -11,6 +11,7 @@ settings:
 namespaces:
   concourse:
   kube-ops-view:
+  garbanzo:
   postgresql:
 
 helmRepos:
@@ -55,3 +56,11 @@ apps:
     secretsFile: helm_charts/concourse/secrets.concourse-creds.yaml
 
   # Applications
+  # garbanzo:
+  #   <<: *default
+  #   namespace: garbanzo
+  #   enabled: true
+  #   chart: helm_charts/garbanzo
+  #   version: 0.1.0
+  #   set:
+  #     image.tag: $GARBANZO_TAG

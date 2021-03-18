@@ -1,8 +1,16 @@
 from flask import Flask
 
-app = Flask('garbonzo')
+from config import Config
+
+app = Flask('garbanzo')
+app.config.from_object(Config)
 
 
 @app.route('/')
 def ping():
     return "Pong!"
+
+
+@app.route('/health')
+def health():
+    return {}

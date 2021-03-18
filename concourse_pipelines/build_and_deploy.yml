@@ -1,0 +1,100 @@
+resources:
+  # Repo to pull for building image
+  - name: redesigned-garbanzo
+    type: git
+    icon: github
+    source:
+      uri: https://github.com/FlipEnergy/redesigned-garbanzo.git
+      branch: main
+
+  # Where we will push the image to
+  - name: google-image-registry
+    type: registry-image
+    icon: google-cloud
+    source:
+      repository: gcr.io/gorgias-challenge/garbanzo
+      username: ((gcs_registry_username))
+      password: ((gcs_registry_password))
+      tag: latest
+
+jobs:
+  - name: build-and-push-image
+    serial: true
+    plan:
+      - get: redesigned-garbanzo
+        trigger: true
+
+      - task: build-image
+        privileged: true
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: vito/oci-build-task
+              tag: 0.7.0
+
+          inputs:
+            - name: redesigned-garbanzo
+
+          outputs:
+            - name: image
+
+          params:
+            CONTEXT: redesigned-garbanzo
+          run:
+            path: build
+
+      - put: google-image-registry
+        params:
+          image: image/image.tar
+          additional_tags: redesigned-garbanzo/.git/short_ref
+
+  - name: deploy-to-k8s
+    serial: true
+    plan:
+      - in_parallel:
+        - get: redesigned-garbanzo
+          trigger: true
+          passed: [build-and-push-image]
+        - get: google-image-registry
+          passed: [build-and-push-image]
+
+      - task: get-kube-config-and-key
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: google/cloud-sdk
+              tag: alpine
+
+          inputs:
+            - name: redesigned-garbanzo
+
+          outputs:
+            - name: redesigned-garbanzo
+
+          params:
+            KEY_JSON: ((gcs_registry_password))
+            CLUSTER: ((gke_cluster))
+            ZONE: ((gke_zone))
+            PROJECT: ((gke_project))
+
+          run:
+            path: redesigned-garbanzo/concourse_pipelines/get_kube_config_and_key.sh
+
+      - task: deploy-to-k8s
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: praqma/helmsman
+              tag: v3.6.6
+
+          inputs:
+            - name: redesigned-garbanzo
+
+          run:
+            path: redesigned-garbanzo/concourse_pipelines/deploy_to_k8s.sh
