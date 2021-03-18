@@ -68,8 +68,8 @@ Python source code for the flask app
 
 ## Initial Local Setup
 1. Install the tools from the **Dependencies** section
-2. Get the GPG key from me.
-3. Import the GPG key to your keychain using `gpg --import <path/to/key>`
+2. Get the GPG key from the kubernetes secret with `kubectl -n concourse get secret gpg-key -o jsonpath='{.data.secretKey}' | base64 --decode > /tmp/secretKey.asc`
+3. Import the GPG key to your keychain using `gpg --import /tmp/secretKey.asc`
 4. Test that you can access the secrets with `helm secrets view helm_charts/postgresql/secrets.postgres-creds.yaml`. You should see yaml printed to stdout.
 
 ## Local Development
@@ -89,8 +89,22 @@ Tear down with
 ## Deploy to K8s
 
 ### Deploy from local
-Assuming you have kubectl set up, deploying the app and dependencies (plus the other tools I added) is as simple as running
-`make deploy`
+Assuming you have kubectl set up, deploying the app and dependencies (plus the other tools I added) is as simple as running:
+```
+GARBANZO_TAG=latest make deploy
+```
+or without make, using docker directly
+```
+GARBANZO_TAG=latest docker run --rm -it \
+	-v $(pwd):/garbanzo \
+	-v ~/.kube/config:/root/.kube/config \
+	-v ~/.gnupg:/root/.gnupg \
+	-w /garbanzo \
+	-e GARBANZO_TAG=$GARBANZO_TAG \
+	praqma/helmsman:v3.6.6 \
+	helmsman -show-diff --apply -f helmsman_dsf.yml
+
+```
 
 It spins up a docker container running Helmsman which will take the [helmsman_dsf.yml](helmsman_dsf.yml) as the desired state and update the k8s cluster to match the state. In this case, it'll spin up postgres (and kube-ops-view) first since it's a dependency, wait until it's ready then it will deploy the app.
 
@@ -112,9 +126,13 @@ If you wish to deploy the latest version of the app + helm chart, simply go to t
 ### Kube-ops-view
 - nice visualization of pods on the nodes that I like to use
 - You can hit it by clicking the link in the **Links to Live Project** section
+- If you're unfamiliar with this tool, I recommend you watch it when deploying pods. The animations are cool
 
 ### Duck DNS
 - a free and super quick setup DNS service that allows me to use a sub domain of duckdns.org
 
 ### HTTPS
 - Yes, I would've setup Let's Encrypt for HTTPS in a real project
+
+### There's a typo in the project ID
+- yeah... typed too fast and missed the h. Since I can't change it and this is temporary, I'll just keep it like that.

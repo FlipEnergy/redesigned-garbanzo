@@ -5,7 +5,7 @@
 replicaCount: 3
 
 image:
-  repository: gcr.io/gorgias-challenge/garbanzo
+  repository: gcr.io/gorgias-callenge/garbanzo
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""

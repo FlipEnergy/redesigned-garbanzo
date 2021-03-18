@@ -4,6 +4,7 @@ deploy:
 	-v ~/.kube/config:/root/.kube/config \
 	-v ~/.gnupg:/root/.gnupg \
 	-w /garbanzo \
+	-e GARBANZO_TAG=$$GARBANZO_TAG \
 	praqma/helmsman:v3.6.6 \
 	helmsman $(options) -show-diff --apply -f helmsman_dsf.yml
 

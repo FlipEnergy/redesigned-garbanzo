@@ -56,11 +56,12 @@ apps:
     secretsFile: helm_charts/concourse/secrets.concourse-creds.yaml
 
   # Applications
-  # garbanzo:
-  #   <<: *default
-  #   namespace: garbanzo
-  #   enabled: true
-  #   chart: helm_charts/garbanzo
-  #   version: 0.1.0
-  #   set:
-  #     image.tag: $GARBANZO_TAG
+  garbanzo:
+    <<: *default
+    namespace: garbanzo
+    enabled: true
+    chart: helm_charts/garbanzo
+    version: 0.1.0
+    secretsFile: helm_charts/garbanzo/secrets.garbanzo-creds.yaml
+    set:
+      image.tag: $GARBANZO_TAG
