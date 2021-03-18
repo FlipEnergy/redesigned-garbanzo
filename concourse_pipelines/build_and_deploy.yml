@@ -58,31 +58,10 @@ jobs:
           trigger: true
           passed: [build-and-push-image]
         - get: google-image-registry
-          passed: [build-and-push-image]
-
-      - task: get-kube-config-and-key
-        config:
-          platform: linux
-          image_resource:
-            type: registry-image
-            source:
-              repository: google/cloud-sdk
-              tag: alpine
-
-          inputs:
-            - name: redesigned-garbanzo
-
-          outputs:
-            - name: redesigned-garbanzo
-
+          trigger: true
           params:
-            KEY_JSON: ((gcs_registry_password))
-            CLUSTER: ((gke_cluster))
-            ZONE: ((gke_zone))
-            PROJECT: ((gke_project))
-
-          run:
-            path: redesigned-garbanzo/concourse_pipelines/get_kube_config_and_key.sh
+            skip_download: true
+          passed: [build-and-push-image]
 
       - task: deploy-to-k8s
         config:
@@ -90,11 +69,16 @@ jobs:
           image_resource:
             type: registry-image
             source:
-              repository: praqma/helmsman
-              tag: v3.6.6
+              repository: gcr.io/gorgias-callenge/gcloud_helmsman
 
           inputs:
             - name: redesigned-garbanzo
+
+          params:
+            KEY_JSON: ((gcs_registry_password))
+            CLUSTER: ((gke_cluster))
+            ZONE: ((gke_zone))
+            PROJECT: ((gke_project))
 
           run:
             path: redesigned-garbanzo/concourse_pipelines/deploy_to_k8s.sh

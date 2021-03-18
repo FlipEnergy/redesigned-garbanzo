@@ -69,7 +69,7 @@ Helm chart for deploying this flask app as well as override files for the other 
 Python source code for the flask app
 
 ## Initial Local Setup
-1. Install the tools from the **Dependencies** section
+1. Install the tools from the **Dependencies** section above
 2. Get the GPG key from the kubernetes secret with `kubectl -n concourse get secret gpg-key -o jsonpath='{.data.secretKey}' | base64 --decode > /tmp/secretKey.asc`
 3. Import the GPG key to your keychain using `gpg --import /tmp/secretKey.asc`
 4. Test that you can access the secrets with `helm secrets view helm_charts/postgresql/secrets.postgres-creds.yaml`. You should see yaml printed to stdout.
@@ -111,7 +111,7 @@ GARBANZO_TAG=latest docker run --rm -it \
 It spins up a docker container running Helmsman which will take the [helmsman_dsf.yml](helmsman_dsf.yml) as the desired state and update the k8s cluster to match the state. In this case, it'll spin up postgres (and kube-ops-view) first since it's a dependency, wait until it's ready then it will deploy the app.
 
 ### Deploy using concourse
-If you wish to deploy the latest version of the app + helm chart, simply go to this [link](TODO), login with creds found on line `localUsers: <username>:<password>` and hit the `+` button on the top right.
+If you wish to deploy the latest version of the app + helm chart, simply go to this [link](http://garbanzo-concourse.duckdns.org/teams/main/pipelines/build-and-deploy/jobs/deploy-to-k8s), login with creds found on line `localUsers: <username>:<password>` in the output of `helm secrets view helm_charts/concourse/secrets.concourse-creds.yaml | grep localUsers` and hit the `+` button on the top right to trigger another run (which would likely be a no-op since it's already the latest deployed).
 
 ## Info Dump
 

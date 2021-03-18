@@ -20,6 +20,10 @@ shell:
 logs:
 	docker-compose logs -f
 
+gcloud_helmsman:
+	docker build -t gcr.io/gorgias-callenge/gcloud_helmsman .
+	docker push gcr.io/gorgias-callenge/gcloud_helmsman
+
 pipeline:
 	fly -t garbanzo login -k -c http://garbanzo-concourse.duckdns.org/
 	sops -d concourse_pipelines/secrets.enc.yml > concourse_pipelines/secrets.dec.yml
