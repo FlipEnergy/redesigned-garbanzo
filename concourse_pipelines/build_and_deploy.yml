@@ -12,7 +12,7 @@ resources:
     type: registry-image
     icon: google-cloud
     source:
-      repository: gcr.io/gorgias-challenge/garbanzo
+      repository: gcr.io/gorgias-callenge/garbanzo
       username: ((gcs_registry_username))
       password: ((gcs_registry_password))
       tag: latest
