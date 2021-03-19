@@ -1,7 +1,7 @@
+from json import dumps
+
 from flask import Flask
 from flask_migrate import Migrate
-
-from json import dumps
 
 from config import Config
 from model import db
