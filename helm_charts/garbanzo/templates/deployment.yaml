@@ -27,6 +27,10 @@ spec:
       serviceAccountName: {{ include "garbanzo.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: migrate
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          command: ['sh', '-c', "flask db migrate && flask db upgrade"]
       containers:
         - name: {{ .Chart.Name }}
           securityContext:

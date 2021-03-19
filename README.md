@@ -93,7 +93,12 @@ or
 Tear down with
 `docker-compose down`
 
+Alternatively, thanks to pipenv, you can also just develop locally without docker if you prefer. You will need to ensure you have python3.8 and pipenv installed. Then `cd` to the src directory and run a `pipenv sync` to install the dependent packages to the virtualenv. Once the virtualenv is setup, you can make a shell in it with `pipenv shell` to source it. Make sure set the proper environment variables to pass the postgres creds to flask and run the migrations against the postgres DB using. In the pipenv shell, you can migrate by running `flask db migrate && flask db upgrade`.
+
 ## Deploy to K8s
+I chose to make a helm chart for the app to deploy it to k8s because it was the simplest option in my mind. Currently, the chart lives in the repo and use it locally rather than packaged. Currently, the artifact that we wish to deploy to k8s is the docker image of the app but ideally, I would make it so the helm chart package be the actual artifact we deploy because it would pin not only the image version in it, but also the chart's version too.
+
+The chart simply spins up a deployment with 3 pods of our flask app running in gunicorn. It will first run a init container to run the DB migrations and since the commands are idempotent, the fact that we have 3 pods is no issue. Alternatively, we could run it as a kubernetes job. In a real prod scenario, these migrations need to be forward compatible and non-table-locking so running the migrations won't break the existing app version serving traffic. 
 
 ### Deploy from local
 Assuming you have kubectl set up, deploying the app and dependencies (plus the other tools I added) is as simple as running:
@@ -118,6 +123,10 @@ It spins up a docker container running Helmsman which will take the [helmsman_ds
 If you wish to deploy the latest version of the app + helm chart, simply go to this [link](http://garbanzo-concourse.duckdns.org/teams/main/pipelines/build-and-deploy/jobs/deploy-to-k8s), login with creds found on line `localUsers: <username>:<password>` in the output of `helm secrets view helm_charts/concourse/secrets.concourse-creds.yaml | grep localUsers` and hit the `+` button on the top right to trigger another run (which would likely be a no-op since it's already the latest deployed).
 
 ## Misc Info Dump
+
+### pipenv
+- pipenv has dependency resolution and locking of these dependency tree versions which I think is highly desirable
+- works well in a docker image to ensure package and python versions are synced from dev to prod
 
 ### postgres
 - deployed via helm using a bitnami chart which already support replication
