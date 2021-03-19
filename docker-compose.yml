@@ -25,7 +25,7 @@ services:
     image: docker.io/bitnami/postgresql:11.11.0-debian-10-r16 
     container_name: postgresql
     volumes:
-      - postgresql_data:/bitnami/postgresql:rw # this mounts the docker-managed elasticsearch_data volume into the container and makes it writable
+      - postgresql_data:/bitnami/postgresql:rw
     environment:
       - POSTGRESQL_USERNAME=garbanzo
       - POSTGRESQL_PASSWORD=WowSuchSecure123

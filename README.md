@@ -128,6 +128,10 @@ If you wish to deploy the latest version of the app + helm chart, simply go to t
 - pipenv has dependency resolution and locking of these dependency tree versions which I think is highly desirable
 - works well in a docker image to ensure package and python versions are synced from dev to prod
 
+### garbanzo Dockerfile
+- went with the official python image as base
+- create a separate user to not run as root
+
 ### postgres
 - deployed via helm using a bitnami chart which already support replication
 - I configured it to use async replication
