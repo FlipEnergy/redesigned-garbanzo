@@ -14,10 +14,14 @@ up:
 stop:
 	docker-compose stop
 
+down:
+	docker-compose down
+
 shell:
 	docker exec -it garbanzo /bin/sh
 
 psql:
+	# POSTGRESQL_POSTGRES_PASSWORD in docker-compose is the password
 	docker exec -it postgresql psql -U postgres
 
 logs:

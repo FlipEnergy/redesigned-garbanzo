@@ -15,6 +15,7 @@ WORKDIR /garbanzo
 
 RUN pip install pipenv==2020.11.15 \
     && pipenv install --system --deploy \
+    && mkdir -p migrations/versions \
     && rm -rf /tmp/.cache/*
 
 CMD ["gunicorn", "-b", "0.0.0.0:8000", "--workers=2", "--access-logfile", "-", "--capture-output", "app:app"]
