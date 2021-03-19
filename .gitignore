@@ -5,3 +5,4 @@
 *.pyc
 .helmsman-tmp/
 *.dec.yml
+src/migrations/versions/*

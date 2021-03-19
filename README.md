@@ -72,17 +72,20 @@ Python source code for the flask app
 
 ## Initial Local Setup
 1. Install the tools from the **Dependencies** section above
-2. Get the GPG key from the kubernetes secret with `kubectl -n concourse get secret gpg-key -o jsonpath='{.data.secretKey}' | base64 --decode > /tmp/secretKey.asc`
-3. Import the GPG key to your keychain using `gpg --import /tmp/secretKey.asc`
-4. Test that you can access the secrets with `helm secrets view helm_charts/postgresql/secrets.postgres-creds.yaml`. You should see yaml printed to stdout.
+2. authenticate with gcloud using `gcloud auth login` then connect to the k8s cluster with `gcloud container clusters get-credentials cluster-1 --zone us-central1-c --project gorgias-callenge`
+3. Get the GPG key from the kubernetes secret with `kubectl -n concourse get secret gpg-key -o jsonpath='{.data.secretKey}' | base64 --decode > /tmp/secretKey.asc`
+4. Import the GPG key to your keychain using `gpg --import /tmp/secretKey.asc`
+5. Test that you can access the secrets with `helm secrets view helm_charts/postgresql/secrets.postgres-creds.yaml`. You should see yaml printed to stdout.
 
 ## Local Development
-I prefer development in a containerized environment. Docker-compose makes spinning up the app and dependencies fairly easy and we can ensure we're running the same databse image to keep things aligned. By default, the app is running flask in debug mode and you can hit the site at localhost:5000. You can comment out the line for `command:` to run it in WSGI gunicorn to be more "prod-like". If you do it this way, it'll be on port 8000 instead. Spin up a local environment with 
+I prefer development in a containerized environment. Docker-compose makes spinning up the app and dependencies fairly easy and we can ensure we're running the same databse image to keep things aligned. By default, the app is running flask in debug mode and you can hit the site at localhost:5000. You can comment out the line for `command:` to run it in WSGI gunicorn to be more "prod-like". If you do it this way, it'll be on port 8000 instead.
+
+Spin up a local environment with 
 `make up`
 or
 `docker-compose up --build -d`
 
-Then stop it with
+Stop it with
 `make stop`
 or
 `docker-compose stop`

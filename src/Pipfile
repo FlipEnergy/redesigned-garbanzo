@@ -6,8 +6,11 @@ name = "pypi"
 [packages]
 flask = "==1.1.2"
 gunicorn = "==20.0.4"
+psycopg2-binary = "==2.8.6"
+flask-sqlalchemy = "==2.5.1"
+flask-migrate = "==2.7.0"
 
 [dev-packages]
 
 [requires]
-python_version = "3.9"
+python_version = "3.8"

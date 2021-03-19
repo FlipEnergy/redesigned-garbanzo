@@ -17,6 +17,9 @@ stop:
 shell:
 	docker exec -it garbanzo /bin/sh
 
+psql:
+	docker exec -it postgresql psql -U postgres
+
 logs:
 	docker-compose logs -f
 
