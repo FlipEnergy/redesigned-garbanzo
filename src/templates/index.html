@@ -1,15 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="{{ url_for('static', filename= 'css/style.css') }}">
-    <title>Garbanzo To do List</title>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="{{ url_for('static', filename= 'css/style.css') }}">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <title>Garbanzo To do List</title>
 </head>
 <body>
-    <h1>Garbanzo To do List:</h1>
-    {% for item in todos %}
-        <h2> - {{ item }}</h2>
-        <hr>
-    {% endfor %}
+  <h1>Garbanzo To do List</h1>
+  <div >
+    <form class="center" id="new_item">
+      <label class="label" for="content">Add a new to do item:</label><br>
+      <input class="input" type="text" id="content" name="content" placeholder="buy more cheese"><br>
+      <input type="submit" value="Submit">
+    </form>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class=flashes>
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+  </div>
+  {% for item in todos %}
+    <h2> - {{ item }}</h2>
+    <hr>
+  {% endfor %}
 </body>
+<script>
+window.addEventListener( "load", function () {
+  function sendData() {
+    const XHR = new XMLHttpRequest();
+
+    // Bind the FormData object and the form element
+    const FD = new FormData( form );
+
+    // Define what happens on successful data submission
+    XHR.addEventListener( "load", function(event) {
+        location.reload();
+    } );
+
+    // Define what happens in case of error
+    XHR.addEventListener( "error", function( event ) {
+        alert( 'Oops! Something went wrong.' );
+    } );
+
+    // Set up our request
+    XHR.open( "POST", "/add_item" );
+
+    // The data sent is what the user provided in the form
+    XHR.send( FD );
+  }
+
+    // Access the form element...
+    const form = document.getElementById( "new_item" );
+
+    // ...and take over its submit event.
+    form.addEventListener( "submit", function ( event ) {
+      event.preventDefault();
+
+      sendData();
+    } );
+} );
+</script>
 </html>

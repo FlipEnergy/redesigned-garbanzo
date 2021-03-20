@@ -1,6 +1,6 @@
 h1 {
-  border: 2px #eee solid;
-  color: rgb(114, 224, 209);
+  border: 3px #eee solid;
+  color: whitesmoke;
   text-align: center;
   padding: 10px;
 }
@@ -13,5 +13,33 @@ h2 {
 
 body {
   background-color: rgb(24, 26, 27);
-  color: white;
+  color: whitesmoke;
+}
+
+.center {
+  margin: auto;
+  width: 50%;
+  border: 2px solid whitesmoke;
+  padding: 5px;
+  display: flex;
+  justify-content: center;
+}
+
+.label {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.input {
+  margin: auto;
+  width: 300px;
+}
+
+.flashes {
+  margin: auto;
+  width: 50%;
+  border: 2px solid red;
+  padding: 5px;
+  display: flex;
+  justify-content: center;
 }

@@ -1,6 +1,6 @@
 from json import dumps
 
-from flask import Flask, render_template, flash
+from flask import abort, Flask, flash, render_template, redirect, request, url_for
 from flask_migrate import Migrate
 
 from config import Config
@@ -19,11 +19,12 @@ app.todo_service = TodoService(db)
 def get_list():
     return render_template('index.html', todos=app.todo_service.get_list())
 
-@app.route('/add', methods=['POST'])
+@app.route('/add_item', methods=['POST'])
 def add_item():
-    content = request.form['content'].strip()
+    content = request.form.get('content', '').strip()
     if not content:
         flash('Please type something in!')
+        abort(400, 'Bad input')
     app.todo_service.add_item(content)
     app.logger.info('New task added: {}'.format(content))
     return {}
