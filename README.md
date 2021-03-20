@@ -124,7 +124,7 @@ GARBANZO_TAG=$(git rev-parse --short origin/main) docker run --rm -it \
 	-w /garbanzo \
 	-e GARBANZO_TAG=$GARBANZO_TAG \
 	praqma/helmsman:v3.6.6 \
-	helmsman -show-diff --apply -f helmsman_dsf.yml
+	helmsman --apply -f helmsman_dsf.yml
 ```
 
 It spins up a docker container running Helmsman which will take the [helmsman_dsf.yml](helmsman_dsf.yml) as the desired state and update the k8s cluster to match the state. In this case, it'll spin up postgres (and kube-ops-view) first since it's a dependency, wait until it's ready then it will deploy the app.
