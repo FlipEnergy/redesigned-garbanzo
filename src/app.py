@@ -1,5 +1,3 @@
-from json import dumps
-
 from flask import abort, Flask, flash, render_template, request
 from flask_migrate import Migrate
 
