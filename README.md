@@ -19,16 +19,19 @@ Even though Helm is not used directly, it's necessary to use the Helm secrets pl
 How to install helm3: https://helm.sh/docs/intro/install/
 
 ### [Helm secrets plugin](https://github.com/jkroepke/helm-secrets)
-I want to avoid spinning up infrastructure like Hashicorp Vault for secret management and manually putting in kubernetes secrets. This allows us to encrypt yaml easily so we can commit them into the git repo. If you're French and are expecting a key, you may get it to unlock the secrets.
+I want to avoid spinning up infrastructure like Hashicorp Vault for secret management and manually putting in kubernetes secrets. This allows us to encrypt yaml easily so we can commit them into the git repo. It uses [sops](https://github.com/mozilla/sops) under the hood which uses GPG keys to encrypt yaml files.
 ```
 # install using
 helm plugin install https://github.com/jkroepke/helm-secrets
 ```
 
+### GPG
+Hopefully this is already installed. We'll need it for encrypting/decrypting the secret yamls. You can probably install it for your system fairly easily from a package manager.
+
 ## Optional
 
 ### make
-I like to keep a makefile in a project for easy aliases that are maintained and scoped within the project. A single easy make command for deployment for example. I your computer doesn't have make installed already and don't want to bother installing make, feel free to just run the commands in the Makefile directly. I'll also give command snippits in docs to show you how to deploy.
+I like to keep a makefile in a project for easy aliases that are maintained and scoped within the project. This allows for a single, easy make command for deployment for example. If your computer doesn't have make installed already and don't want to bother installing make, feel free to just run the commands in the Makefile directly. I'll also give command snippits in docs to show you how to deploy.
 
 ### fly
 fly is the cli tool to interact with concourse such as setting up a pipeline. If you want to install it, you can download it from the homepage of the concourse instance (see **Links to Live Project** for link)
@@ -36,10 +39,10 @@ fly is the cli tool to interact with concourse such as setting up a pipeline. If
 ## Other Tools
 
 ### [Helmsman](https://github.com/Praqma/helmsman)
-Helmsman lets me specify multiple helm charts and their override values in a nice yaml format such that I don't need to write a script to call helm multiple times. It has great features like prioritization, auto secrets decrypting, hooks, etc. Best of all, the yaml you write is a desired state file, meaning if the k8s cluster is already running stuff in the state you specified, it's a no-op, meaning running helmsman is completely idempotent. Great for CI.
+Helmsman lets me specify multiple helm charts and their override values in a nice yaml format such that I don't need to write a script to call helm multiple times. It has great features like prioritization, auto secrets decrypting, hooks, etc. Best of all, the yaml you write is a desired state file (see [helmsman_dsf.yml](helmsman_dsf.yml)), meaning if the k8s cluster is already running stuff in the state you specified, it's a no-op, meaning running helmsman is completely idempotent. Great for CI.
 I'm running it thru docker.
 
-### [Concourse](http://garbanzo-concourse.duckdns.org/teams/main/pipelines/build-and-deploy)
+### [Concourse](https://concourse-ci.org/)
 I love this CI system mostly due to the UI. It's the main CI system at my current work and also my CI/automation system of choice for my Homelab. For this project, it will run a simple CICD system of building the image then using a helm chart to deploy it to k8s.
 
 Since I will be using concourse for CICD, it needs to also have the GPG key to decode the helm secrets.
@@ -154,9 +157,9 @@ If you wish to deploy the latest version of the app + helm chart, simply go to t
 - a free and super quick setup DNS service that allows me to use a sub domain of www.duckdns.org
 
 ### HTTPS
-- Yes, I would've setup Let's Encrypt for HTTPS in a real project
+- Yes, I would've setup Let's Encrypt for HTTPS in a more permanent project
 
-### There's a typo in the project ID
+### There's a typo in the GKE project ID
 - yeah... typed too fast and missed the h. Since I can't change it and this is temporary, I'll just keep it like that.
 
 ### Why is the repo named redesigned-garbanzo?
@@ -167,3 +170,5 @@ If you wish to deploy the latest version of the app + helm chart, simply go to t
 - pagination of list rathern than returning it all every time
 - obviously better designed frontend
 - stop using ORM? This one is debatable but in some situations ORM could cause performance issues
+- treat packaged helm charts with specific image versions as the artifact to deploy rather than using the docker image and a local chart as it is currently
+- of course other features like deleting or crossing off something from the list
