@@ -323,30 +323,6 @@ concourse:
     ## Configurations regarding how the web component is able to connect to a postgres
     ## instance.
     ##
-    postgres:
-      ## The host to connect to.
-      ##
-      host: postgresql.postgresql.svc.cluster.local
-
-      ## The port to connect to.
-      ##
-      port: 5432
-
-      ## Path to a UNIX domain socket to connect to.
-      ##
-      socket:
-
-      ## Whether or not to use SSL.
-      ##
-      sslmode: disable
-
-      ## Dialing timeout. (0 means wait indefinitely)
-      ##
-      connectTimeout: 5m
-
-      ## The name of the database to use.
-      ##
-      database: concourse
 
     kubernetes:
       ## Enable the use of Kubernetes Secrets as the credential provider for
