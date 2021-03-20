@@ -1,0 +1,17 @@
+h1 {
+  border: 2px #eee solid;
+  color: rgb(114, 224, 209);
+  text-align: center;
+  padding: 10px;
+}
+
+h2 {
+  border: 1px #eee solid;
+  color: whitesmoke;
+  padding: 15px;
+}
+
+body {
+  background-color: rgb(24, 26, 27);
+  color: white;
+}

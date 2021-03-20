@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename= 'css/style.css') }}">
+    <title>Garbanzo To do List</title>
+</head>
+<body>
+    <h1>Garbanzo To do List:</h1>
+    {% for item in todos %}
+        <h2> - {{ item }}</h2>
+        <hr>
+    {% endfor %}
+</body>
+</html>

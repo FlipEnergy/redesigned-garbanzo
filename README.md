@@ -129,13 +129,14 @@ If you wish to deploy the latest version of the app + helm chart, simply go to t
 - works well in a docker image to ensure package and python versions are synced from dev to prod
 
 ### garbanzo Dockerfile
-- went with the official python image as base
+- went with the official python image as base with a version that supports the packages I need
 - create a separate user to not run as root
+- separate layer for Pipfile and Pipfile.lock so it can be cached for local development
 
 ### postgres
 - deployed via helm using a bitnami chart which already support replication
 - I configured it to use async replication
-- soft antiaffinity between the two postgres pods to try to keep them on separate k8s nodes
+- soft anti-affinity between the two postgres pods to try to keep them on separate k8s nodes
 - Overall just a really nice and well implemented chart that I use for my Homelab. Why reinvent the wheel?
 
 ### concourse

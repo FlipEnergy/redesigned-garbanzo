@@ -11,5 +11,5 @@ class TodoService(object):
     def add_item(self, content):
         '''Adds a new Todo item with content'''
         new_todo = Todo(content=content)
-        self.db_session.session.add(new_todo)
-        self.db_session.session.commit()
+        self.db_session.add(new_todo)
+        self.db_session.commit()
