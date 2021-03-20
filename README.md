@@ -161,3 +161,9 @@ If you wish to deploy the latest version of the app + helm chart, simply go to t
 
 ### Why is the repo named redesigned-garbanzo?
 - because that's the auto generated repo name github suggested
+
+### Some ways to improve the app off the top of my head
+- better error handling in case of database or connection to database issues
+- pagination of list rathern than returning it all every time
+- obviously better designed frontend
+- stop using ORM? This one is debatable but in some situations ORM could cause performance issues

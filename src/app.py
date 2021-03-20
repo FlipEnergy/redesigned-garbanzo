@@ -21,10 +21,14 @@ def get_list():
 
 @app.route('/add_item', methods=['POST'])
 def add_item():
+    # sqlalchemy does sanitation of inputs for security so I'll just strip leading and trailing whitespace
     content = request.form.get('content', '').strip()
     if not content:
         flash('Please type something in!')
-        abort(400, 'Bad input')
+        abort(400)
+    elif len(content) > 240:
+        flash('Input cannot be longer than 240 characters!')
+        abort(400)
     app.todo_service.add_item(content)
     app.logger.info('New task added: {}'.format(content))
     return {}
