@@ -18,11 +18,33 @@ resources:
       tag: latest
 
 jobs:
+  - name: lint
+    plan:
+      - get: redesigned-garbanzo
+        trigger: true
+
+      - task: pycodestyle
+        privileged: true
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: cytopia/pycodestyle
+
+          inputs:
+            - name: redesigned-garbanzo
+
+          run:
+            path: pycodestyle
+            args: ['--exclude=redesigned-garbanzo/src/migrations', 'redesigned-garbanzo/src']
+
   - name: build-and-push-image
     serial: true
     plan:
       - get: redesigned-garbanzo
         trigger: true
+        passed: [lint]
 
       - task: build-image
         privileged: true

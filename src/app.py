@@ -1,6 +1,6 @@
 from json import dumps
 
-from flask import abort, Flask, flash, render_template, redirect, request, url_for
+from flask import abort, Flask, flash, render_template, request
 from flask_migrate import Migrate
 
 from config import Config
@@ -19,9 +19,11 @@ app.todo_service = TodoService(db)
 def get_list():
     return render_template('index.html', todos=app.todo_service.get_list())
 
+
 @app.route('/add_item', methods=['POST'])
 def add_item():
-    # sqlalchemy does sanitation of inputs for security so I'll just strip leading and trailing whitespace
+    # sqlalchemy does sanitation of inputs for security
+    # so just strip leading and trailing whitespace
     content = request.form.get('content', '').strip()
     if not content:
         flash('Please type something in!')
@@ -33,9 +35,11 @@ def add_item():
     app.logger.info('New task added: {}'.format(content))
     return {}
 
+
 @app.route('/health')
 def health():
     return {}
+
 
 @app.errorhandler(404)
 def page_not_found(e):
