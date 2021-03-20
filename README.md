@@ -75,10 +75,11 @@ Python source code for the flask app
 
 ## Initial Local Setup
 1. Install the tools from the **Dependencies** section above
-2. authenticate with gcloud using `gcloud auth login` then connect to the k8s cluster with `gcloud container clusters get-credentials cluster-1 --zone us-central1-c --project gorgias-callenge`
-3. Get the GPG key from the kubernetes secret with `kubectl -n concourse get secret gpg-key -o jsonpath='{.data.secretKey}' | base64 --decode > /tmp/secretKey.asc`
-4. Import the GPG key to your keychain using `gpg --import /tmp/secretKey.asc`
-5. Test that you can access the secrets with `helm secrets view helm_charts/postgresql/secrets.postgres-creds.yaml`. You should see yaml printed to stdout.
+2. make sure your current working directory is at the root of this repo. All commands in this doc assume you're at the root of the repo
+3. authenticate with gcloud using `gcloud auth login` then connect to the k8s cluster with `gcloud container clusters get-credentials cluster-1 --zone us-central1-c --project gorgias-callenge`
+4. Get the GPG key from the kubernetes secret with `kubectl -n concourse get secret gpg-key -o jsonpath='{.data.secretKey}' | base64 --decode > /tmp/secretKey.asc`
+5. Import the GPG key to your keychain using `gpg --import /tmp/secretKey.asc`
+6. Test that you can access the secrets with `helm secrets view helm_charts/garbanzo/secrets.garbanzo-creds.yaml`. You should see yaml printed to stdout.
 
 ## Local Development
 I prefer development in a containerized environment. Docker-compose makes spinning up the app and dependencies fairly easy and we can ensure we're running the same databse image to keep things aligned. By default, the app is running flask in debug mode and you can hit the site at localhost:5000. You can comment out the line for `command:` to run it in WSGI gunicorn to be more "prod-like". If you do it this way, it'll be on port 8000 instead.
@@ -96,7 +97,7 @@ or
 Tear down with
 `docker-compose down`
 
-Alternatively, thanks to pipenv, you can also just develop locally without docker if you prefer. You will need to ensure you have python3.8 and pipenv installed. Then `cd` to the src directory and run a `pipenv sync` to install the dependent packages to the virtualenv. Once the virtualenv is setup, you can make a shell in it with `pipenv shell` to source it. Make sure set the proper environment variables to pass the postgres creds to flask and run the migrations against the postgres DB using. In the pipenv shell, you can migrate by running `flask db migrate && flask db upgrade`.
+Alternatively, thanks to pipenv, you can also just develop locally without docker if you prefer. You will need to ensure you have python3.8 and pipenv installed. Then `cd` to the src directory and run a `pipenv sync` to install the dependent packages to the virtualenv. Once the virtualenv is setup, you can make a shell in it with `pipenv shell` to source it. Make sure set the proper environment variables to pass the postgres creds to flask and run the migrations against the postgres DB using. In the pipenv shell, you can migrate by running `flask db upgrade`.
 
 ## Deploy to K8s
 I chose to make a helm chart for the app to deploy it to k8s because it was the simplest option in my mind. Currently, the chart lives in the repo and use it locally rather than packaged. Currently, the artifact that we wish to deploy to k8s is the docker image of the app but ideally, I would make it so the helm chart package be the actual artifact we deploy because it would pin not only the image version in it, but also the chart's version too.
@@ -106,11 +107,11 @@ The chart simply spins up a deployment with 3 pods of our flask app running in g
 ### Deploy from local
 Assuming you have kubectl set up, deploying the app and dependencies (plus the other tools I added) is as simple as running:
 ```
-GARBANZO_TAG=latest make deploy
+GARBANZO_TAG=$(git rev-parse --short origin/main) make deploy
 ```
 or without make, using docker directly
 ```
-GARBANZO_TAG=latest docker run --rm -it \
+GARBANZO_TAG=$(git rev-parse --short origin/main) docker run --rm -it \
 	-v $(pwd):/garbanzo \
 	-v ~/.kube/config:/root/.kube/config \
 	-v ~/.gnupg:/root/.gnupg \
@@ -124,6 +125,17 @@ It spins up a docker container running Helmsman which will take the [helmsman_ds
 
 ### Deploy using concourse
 If you wish to deploy the latest version of the app + helm chart, simply go to this [link](http://garbanzo-concourse.duckdns.org/teams/main/pipelines/build-and-deploy/jobs/deploy-to-k8s), login with creds found on line `localUsers: <username>:<password>` in the output of `helm secrets view helm_charts/concourse/secrets.concourse-creds.yaml | grep localUsers` and hit the `+` button on the top right to trigger another run (which would likely be a no-op since it's already the latest deployed).
+
+### Deploying from scratch
+Let's say we want to nuke whole project and redeploy it. The only thing that we cannot really delete because I manually added was the GPG key secret, so I'm gonna avoid deleting namespaces, or more specifically, the concourse secret gpg-key. Aside from that, we can go thru the steps below to delete everything running.
+
+1. We can uninstall all the helm charts by change the `enabled` flag in `helmsman_dsf.yml` to `false`, which means helm uninstall will be run on each of them.
+2. once step 1 is done, we can run the same deploy command from local: `make deploy`
+3. delete the PVCs with `kubectl -n postgresql delete pvc/data-postgresql-postgresql-primary-0 pvc/data-postgresql-read-0` and `kubectl -n concourse delete pvc/data-concourse-postgresql-0`
+4. at this point the only thing left is the secret gpg-key we want to keep, so let's bring everything back up
+5. to setup everything again with a clean slate, revert your change to `helmsman_dsf.yml` so everything is enabled and just run `GARBANZO_TAG=$(git rev-parse --short origin/main) make deploy`
+6. Due to the database reset, the concourse pipeline is gone, so if you want that back, run `make pipeline` and loging with the creds from `helm secrets view helm_charts/concourse/secrets.concourse-creds.yaml | grep localUsers`
+7. You should see the [pipeline](http://garbanzo-concourse.duckdns.org/teams/main/pipelines/build-and-deploy) now there but in a paused state. Feel free to click the triangle play button on the top right to unpause it after logging in.
 
 ## Misc Info Dump
 
@@ -146,12 +158,13 @@ If you wish to deploy the latest version of the app + helm chart, simply go to t
 - pipeline to build image on new commits to repo then deploys if image builds successfully
 - uses a Google service account to push/pull images and deploy to k8s. Has limited permissions
 - I had to make a new image that included both helmsman and google SDK for the service account to be able to deploy
-- it also uses postgres as a database so it has it's own database and creds
+- it also uses postgres as a database so it has it's own instance of postgres and creds. Wanted to isolate it so we can tear it down independent of the app
 
 ### Kube-ops-view
 - nice visualization of pods on the nodes that I like to use
 - You can hit it by clicking the link in the **Links to Live Project** section
 - If you're unfamiliar with this tool, I recommend you watch it when deploying pods. The animations are cool
+- I slightly modified a deprecated helm chart for this project so the chart is in the repo at helm_charts/kube-ops-view
 
 ### Duck DNS
 - a free and super quick setup DNS service that allows me to use a sub domain of www.duckdns.org
@@ -172,3 +185,4 @@ If you wish to deploy the latest version of the app + helm chart, simply go to t
 - stop using ORM? This one is debatable but in some situations ORM could cause performance issues
 - treat packaged helm charts with specific image versions as the artifact to deploy rather than using the docker image and a local chart as it is currently
 - of course other features like deleting or crossing off something from the list
+- setup monitoring and alerting. Google console's features are a good start but we probably want something like influxdb + grafana or some proprietary solution like Datadog

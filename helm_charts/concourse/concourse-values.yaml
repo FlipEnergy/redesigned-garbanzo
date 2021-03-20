@@ -919,7 +919,7 @@ web:
       ## When using `web.service.api.type: LoadBalancer`, sets the user-specified load balancer IP.
       ## Example: 172.217.1.174
       ##
-      loadBalancerIP:
+      loadBalancerIP: 35.192.157.246
 
       ## Additional Labels to be added to the web api service.
       ##
@@ -1194,7 +1194,40 @@ postgresql:
   ##
   ## Should be set to false if using the chart as a worker only deployment.
   ##
-  enabled: false
+  enabled: true
+
+  ## PostgreSQL Database to create.
+  ##
+  postgresqlDatabase: concourse
+
+  ## Persistent Volume Storage configuration for PostgreSQL.
+  ##
+  ## Ref: https://kubernetes.io/docs/user-guide/persistent-volumes
+  ##
+  persistence:
+    ## Enable PostgreSQL persistence using Persistent Volume Claims.
+    ##
+    enabled: true
+
+    ## Persistent Volume Storage Class to be used by PersistentVolumes created
+    ## for PostgreSQL.
+    ##
+    ## If defined, storageClassName: <storageClass>
+    ## If set to "-", storageClassName: "", which disables dynamic provisioning
+    ## If undefined (the default) or set to null, no storageClassName spec is
+    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+    ##   GKE, AWS & OpenStack)
+    ##
+    storageClass: standard
+
+    ## Persistent Volume Access Mode.
+    ##
+    accessModes:
+      - ReadWriteOnce
+
+    ## Persistent Volume Storage Size.
+    ##
+    size: 1Gi
 
 ## For Kubernetes RBAC support:
 ##

@@ -43,6 +43,7 @@ securityContext: {}
 service:
   type: LoadBalancer
   port: 80
+  loadBalancerIP: 34.66.133.46
 
 ingress:
   enabled: false

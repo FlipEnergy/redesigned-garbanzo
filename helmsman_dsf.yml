@@ -17,7 +17,6 @@ namespaces:
 helmRepos:
   bitnami: https://charts.bitnami.com/bitnami
   concourse: https://concourse-charts.storage.googleapis.com/
-  stable: https://charts.helm.sh/stable
 
 appsTemplates:
   default: &default
@@ -29,7 +28,7 @@ apps:
     <<: *default
     namespace: kube-ops-view
     enabled: true
-    chart: stable/kube-ops-view
+    chart: helm_charts/kube-ops-view
     version: 1.2.1
     valuesFile: helm_charts/kube-ops-view/kube-ops-view-values.yaml
     priority : -100
@@ -54,6 +53,7 @@ apps:
     version: 14.6.2
     valuesFile: helm_charts/concourse/concourse-values.yaml
     secretsFile: helm_charts/concourse/secrets.concourse-creds.yaml
+    priority: -100
 
   # Applications
   garbanzo:

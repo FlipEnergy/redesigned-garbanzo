@@ -1,34 +1,38 @@
+# Declare variables to be passed into your templates.
 replicaCount: 1
 image:
   repository: hjacobs/kube-ops-view
   tag: 20.4.0
   pullPolicy: IfNotPresent
-
 service:
   # annotations:
   #   service.beta.kubernetes.io/aws-load-balancer-internal: "0.0.0.0/0"
   # labels:
   #   key: value
-  type: LoadBalancer
+  type: ClusterIP
   externalPort: 80
   internalPort: 8080
-  loadBalancerIP: 35.188.64.27
-
 resources:
   limits:
     cpu: 100m
     memory: 128Mi
   requests:
-    cpu: 50m
-    memory: 128Mi
-
+    cpu: 80m
+    memory: 64Mi
 ingress:
   enabled: false
-
-
+  path: /
+  hostname: kube-ops-view.local
+  annotations: {}
+  #   kubernetes.io/ingress.class: nginx
+  tls: []
+  ## Secrets must be manually created in the namespace
+  #   - secretName: kube-ops-view.local-tls
+  #     hosts:
+  #       - kube-ops-view.local
 rbac:
   # If true, create & use RBAC resources
-  create: true
+  create: false
   # Ignored if rbac.create is true
   serviceAccountName: default
 
@@ -47,3 +51,13 @@ securityContext: {}
 
 # Add securityContext at pod level:
 podSecurityContext: {}
+
+# Defaults for Redis
+redis:
+  enabled: false
+  usePassword: false
+  cluster:
+    enabled: false
+  master:
+    persistence:
+      enabled: false
