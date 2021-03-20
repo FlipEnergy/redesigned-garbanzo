@@ -11,6 +11,12 @@ A flask to do list app backed by PostgreSQL
 
 ## Dependencies
 
+### google SDK
+You need gcloud cli to auth against the cluster
+
+### kubectl
+We're working with a k8s cluster so you might want to install this too.
+
 ### Docker and Docker-compose
 To avoid downloading tools, I just use docker images of them. Easier to upgrade and maintain. Local dev will also be using docker and docker-compose. We'll be runninng [Helmsman](https://github.com/Praqma/helmsman) thru docker for deployments.
 
@@ -102,7 +108,7 @@ Alternatively, thanks to pipenv, you can also just develop locally without docke
 ## Deploy to K8s
 I chose to make a helm chart for the app to deploy it to k8s because it was the simplest option in my mind. Currently, the chart lives in the repo and use it locally rather than packaged. Currently, the artifact that we wish to deploy to k8s is the docker image of the app but ideally, I would make it so the helm chart package be the actual artifact we deploy because it would pin not only the image version in it, but also the chart's version too.
 
-The chart simply spins up a deployment with 3 pods of our flask app running in gunicorn. It will first run a init container to run the DB migrations and since the commands are idempotent, the fact that we have 3 pods is no issue. Alternatively, we could run it as a kubernetes job. In a real prod scenario, these migrations need to be forward compatible and non-table-locking so running the migrations won't break the existing app version serving traffic. 
+The chart simply spins up a deployment with 3 pods of our flask app running in gunicorn. It will first run a init container to run the DB migrations and since the commands are idempotent, the fact that we have 3 pods is no issue. Alternatively, we could run it as a kubernetes job. In a real prod scenario, these migrations need to be forward compatible and non-table-locking so running the migrations won't break the existing app version serving traffic.
 
 ### Deploy from local
 Assuming you have kubectl set up, deploying the app and dependencies (plus the other tools I added) is as simple as running:
@@ -123,6 +129,8 @@ GARBANZO_TAG=$(git rev-parse --short origin/main) docker run --rm -it \
 
 It spins up a docker container running Helmsman which will take the [helmsman_dsf.yml](helmsman_dsf.yml) as the desired state and update the k8s cluster to match the state. In this case, it'll spin up postgres (and kube-ops-view) first since it's a dependency, wait until it's ready then it will deploy the app.
 
+Note: if you get errors about gcloud, then you just need to run a kubectl command to re-authenticate. Something like `kubectl get pods` will do.
+
 ### Deploy using concourse
 If you wish to deploy the latest version of the app + helm chart, simply go to this [link](http://garbanzo-concourse.duckdns.org/teams/main/pipelines/build-and-deploy/jobs/deploy-to-k8s), login with creds found on line `localUsers: <username>:<password>` in the output of `helm secrets view helm_charts/concourse/secrets.concourse-creds.yaml | grep localUsers` and hit the `+` button on the top right to trigger another run (which would likely be a no-op since it's already the latest deployed).
 
@@ -131,10 +139,14 @@ Let's say we want to nuke whole project and redeploy it. The only thing that we 
 
 1. We can uninstall all the helm charts by change the `enabled` flag in `helmsman_dsf.yml` to `false`, which means helm uninstall will be run on each of them.
 2. once step 1 is done, we can run the same deploy command from local: `make deploy`
-3. delete the PVCs with `kubectl -n postgresql delete pvc/data-postgresql-postgresql-primary-0 pvc/data-postgresql-read-0` and `kubectl -n concourse delete pvc/data-concourse-postgresql-0`
+3. delete the PVCs with
+```
+kubectl -n postgresql delete pvc/data-postgresql-postgresql-primary-0 pvc/data-postgresql-read-0
+kubectl -n concourse delete pvc/data-concourse-postgresql-0
+```
 4. at this point the only thing left is the secret gpg-key we want to keep, so let's bring everything back up
 5. to setup everything again with a clean slate, revert your change to `helmsman_dsf.yml` so everything is enabled and just run `GARBANZO_TAG=$(git rev-parse --short origin/main) make deploy`
-6. Due to the database reset, the concourse pipeline is gone, so if you want that back, run `make pipeline` and loging with the creds from `helm secrets view helm_charts/concourse/secrets.concourse-creds.yaml | grep localUsers`
+6. Due to the database reset, the concourse pipeline is gone, so if you want that back, run `make pipeline` and log in with the creds from `helm secrets view helm_charts/concourse/secrets.concourse-creds.yaml | grep localUsers`
 7. You should see the [pipeline](http://garbanzo-concourse.duckdns.org/teams/main/pipelines/build-and-deploy) now there but in a paused state. Feel free to click the triangle play button on the top right to unpause it after logging in.
 
 ## Misc Info Dump
