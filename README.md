@@ -186,3 +186,8 @@ Let's say we want to nuke whole project and redeploy it. The only thing that we 
 - treat packaged helm charts with specific image versions as the artifact to deploy rather than using the docker image and a local chart as it is currently
 - of course other features like deleting or crossing off something from the list
 - setup monitoring and alerting. Google console's features are a good start but we probably want something like influxdb + grafana or some proprietary solution like Datadog
+
+### You can feel free to checkout my homelab project
+- [website](https://pleasenoddos.com)
+- [Repo for configuration management of hardware](https://github.com/FlipEnergy/ansible-playground)
+- [Repo for managing the helm charts and apps I deploy into my k8s](https://github.com/FlipEnergy/k8s-homelab)
